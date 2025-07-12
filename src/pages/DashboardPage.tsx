@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Package, ArrowUpDown, Clock, CheckCircle, XCircle, Edit, Trash2 } from 'lucide-react';
+import {
+  Plus,
+  Package,
+  ArrowUpDown,
+  CheckCircle,
+  XCircle,
+  Edit,
+  Trash2,
+} from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useItems } from '../contexts/ItemContext';
 import toast from 'react-hot-toast';
@@ -110,7 +118,7 @@ const DashboardPage: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mb-8"
+          className="flex gap-4 mb-8"
         >
           <Link to="/add-item">
             <motion.button
@@ -122,6 +130,20 @@ const DashboardPage: React.FC = () => {
               <span>Add New Item</span>
             </motion.button>
           </Link>
+
+          <a
+            href="https://v0-apparel-swap-analytics.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="px-6 py-3 bg-indigo-600 text-white rounded-lg shadow-lg hover:bg-indigo-700 transition-shadow"
+            >
+              Admin Panel
+            </motion.button>
+          </a>
         </motion.div>
 
         {/* Tabs */}
@@ -157,66 +179,51 @@ const DashboardPage: React.FC = () => {
           </div>
 
           <div className="p-6">
-            {/* My Items Tab */}
             {activeTab === 'items' && (
               <div className="space-y-4">
-                {userItems.length === 0 ? (
-                  <div className="text-center py-12">
-                    <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No items yet</h3>
-                    <p className="text-gray-600 mb-4">Start by adding your first item to the community</p>
-                    <Link to="/add-item">
-                      <button className="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
-                        Add Your First Item
-                      </button>
-                    </Link>
-                  </div>
-                ) : (
-                  userItems.map((item) => (
-                    <motion.div
-                      key={item.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
-                    >
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className="w-16 h-16 object-cover rounded-lg"
-                      />
-                      <div className="flex-1">
-                        <h3 className="font-medium text-gray-900">{item.title}</h3>
-                        <p className="text-sm text-gray-600">{item.category} • {item.size}</p>
-                        <span
-                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full mt-1 ${
-                            item.status === 'available'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-600'
-                          }`}
-                        >
-                          {item.status}
-                        </span>
-                      </div>
-                      <div className="flex space-x-2">
-                        <Link to={`/item/${item.id}`}>
-                          <button className="p-2 text-gray-600 hover:text-teal-600 transition-colors">
-                            <Edit className="h-4 w-4" />
-                          </button>
-                        </Link>
-                        <button
-                          onClick={() => handleDeleteItem(item.id)}
-                          className="p-2 text-gray-600 hover:text-red-600 transition-colors"
-                        >
-                          <Trash2 className="h-4 w-4" />
+                {userItems.map((item) => (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg"
+                  >
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="w-16 h-16 object-cover rounded-lg"
+                    />
+                    <div className="flex-1">
+                      <h3 className="font-medium text-gray-900">{item.title}</h3>
+                      <p className="text-sm text-gray-600">{item.category} • {item.size}</p>
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full mt-1 ${
+                          item.status === 'available'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-600'
+                        }`}
+                      >
+                        {item.status}
+                      </span>
+                    </div>
+                    <div className="flex space-x-2">
+                      <Link to={`/item/${item.id}`}>
+                        <button className="p-2 text-gray-600 hover:text-teal-600">
+                          <Edit className="h-4 w-4" />
                         </button>
-                      </div>
-                    </motion.div>
-                  ))
-                )}
+                      </Link>
+                      <button
+                        onClick={() => handleDeleteItem(item.id)}
+                        className="p-2 text-gray-600 hover:text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
             )}
 
-            {/* Swap Requests Tab */}
             {activeTab === 'requests' && (
               <div className="space-y-6">
                 {/* Incoming Requests */}
@@ -224,80 +231,37 @@ const DashboardPage: React.FC = () => {
                   <h3 className="text-lg font-medium text-gray-900 mb-4">
                     Incoming Requests ({incoming.length})
                   </h3>
-                  {incoming.length === 0 ? (
-                    <p className="text-gray-600">No incoming requests</p>
-                  ) : (
-                    <div className="space-y-4">
-                      {incoming.map((request) => (
-                        <motion.div
-                          key={request.id}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="border border-gray-200 rounded-lg p-4"
-                        >
-                          <div className="flex items-center justify-between mb-3">
-                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(request.status)}`}>
-                              {request.status}
-                            </span>
-                            <span className="text-sm text-gray-500">
-                              {request.createdAt.toLocaleDateString()}
-                            </span>
-                          </div>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <p className="text-sm text-gray-600 mb-2">They want your:</p>
-                              <div className="flex items-center space-x-3">
-                                <img
-                                  src={request.requestedItem.image}
-                                  alt={request.requestedItem.title}
-                                  className="w-12 h-12 object-cover rounded"
-                                />
-                                <div>
-                                  <p className="font-medium">{request.requestedItem.title}</p>
-                                  <p className="text-sm text-gray-600">{request.requestedItem.size}</p>
-                                </div>
-                              </div>
-                            </div>
-                            
-                            <div>
-                              <p className="text-sm text-gray-600 mb-2">They offer:</p>
-                              <div className="flex items-center space-x-3">
-                                <img
-                                  src={request.offeredItem.image}
-                                  alt={request.offeredItem.title}
-                                  className="w-12 h-12 object-cover rounded"
-                                />
-                                <div>
-                                  <p className="font-medium">{request.offeredItem.title}</p>
-                                  <p className="text-sm text-gray-600">{request.offeredItem.size}</p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          {request.status === 'pending' && (
-                            <div className="flex space-x-2 mt-4">
-                              <button
-                                onClick={() => handleAcceptRequest(request.id)}
-                                className="flex items-center space-x-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                              >
-                                <CheckCircle className="h-4 w-4" />
-                                <span>Accept</span>
-                              </button>
-                              <button
-                                onClick={() => handleRejectRequest(request.id)}
-                                className="flex items-center space-x-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                              >
-                                <XCircle className="h-4 w-4" />
-                                <span>Reject</span>
-                              </button>
-                            </div>
-                          )}
-                        </motion.div>
-                      ))}
+                  {incoming.map((req) => (
+                    <div
+                      key={req.id}
+                      className="border border-gray-200 rounded-lg p-4 space-y-2"
+                    >
+                      <div className="flex justify-between">
+                        <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(req.status)}`}>
+                          {req.status}
+                        </span>
+                        <span className="text-xs text-gray-500">{req.createdAt.toLocaleDateString()}</span>
+                      </div>
+                      <p className="text-sm text-gray-700">They want: {req.requestedItem.title}</p>
+                      <p className="text-sm text-gray-700">They offer: {req.offeredItem.title}</p>
+                      {req.status === 'pending' && (
+                        <div className="flex gap-2 mt-2">
+                          <button
+                            onClick={() => handleAcceptRequest(req.id)}
+                            className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                          >
+                            Accept
+                          </button>
+                          <button
+                            onClick={() => handleRejectRequest(req.id)}
+                            className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      )}
                     </div>
-                  )}
+                  ))}
                 </div>
 
                 {/* Outgoing Requests */}
@@ -305,61 +269,21 @@ const DashboardPage: React.FC = () => {
                   <h3 className="text-lg font-medium text-gray-900 mb-4">
                     Outgoing Requests ({outgoing.length})
                   </h3>
-                  {outgoing.length === 0 ? (
-                    <p className="text-gray-600">No outgoing requests</p>
-                  ) : (
-                    <div className="space-y-4">
-                      {outgoing.map((request) => (
-                        <motion.div
-                          key={request.id}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="border border-gray-200 rounded-lg p-4"
-                        >
-                          <div className="flex items-center justify-between mb-3">
-                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(request.status)}`}>
-                              {request.status}
-                            </span>
-                            <span className="text-sm text-gray-500">
-                              {request.createdAt.toLocaleDateString()}
-                            </span>
-                          </div>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <p className="text-sm text-gray-600 mb-2">You want:</p>
-                              <div className="flex items-center space-x-3">
-                                <img
-                                  src={request.requestedItem.image}
-                                  alt={request.requestedItem.title}
-                                  className="w-12 h-12 object-cover rounded"
-                                />
-                                <div>
-                                  <p className="font-medium">{request.requestedItem.title}</p>
-                                  <p className="text-sm text-gray-600">{request.requestedItem.size}</p>
-                                </div>
-                              </div>
-                            </div>
-                            
-                            <div>
-                              <p className="text-sm text-gray-600 mb-2">You offered:</p>
-                              <div className="flex items-center space-x-3">
-                                <img
-                                  src={request.offeredItem.image}
-                                  alt={request.offeredItem.title}
-                                  className="w-12 h-12 object-cover rounded"
-                                />
-                                <div>
-                                  <p className="font-medium">{request.offeredItem.title}</p>
-                                  <p className="text-sm text-gray-600">{request.offeredItem.size}</p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </motion.div>
-                      ))}
+                  {outgoing.map((req) => (
+                    <div
+                      key={req.id}
+                      className="border border-gray-200 rounded-lg p-4 space-y-2"
+                    >
+                      <div className="flex justify-between">
+                        <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(req.status)}`}>
+                          {req.status}
+                        </span>
+                        <span className="text-xs text-gray-500">{req.createdAt.toLocaleDateString()}</span>
+                      </div>
+                      <p className="text-sm text-gray-700">You want: {req.requestedItem.title}</p>
+                      <p className="text-sm text-gray-700">You offered: {req.offeredItem.title}</p>
                     </div>
-                  )}
+                  ))}
                 </div>
               </div>
             )}
