@@ -1,157 +1,90 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowRight } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { useItems, Item } from '../contexts/ItemContext';
-import toast from 'react-hot-toast';
+import React, { useState } from "react";
+import { Dialog } from "@headlessui/react";
+import { X } from "lucide-react";
+import toast from "react-hot-toast";
+import { useAuth } from "../contexts/AuthContext";
+import { useItems } from "../contexts/ItemContext";
 
-interface SwapRequestModalProps {
-  item: Item;
-  onClose: () => void;
-}
-
-const SwapRequestModal: React.FC<SwapRequestModalProps> = ({ item, onClose }) => {
-  const { user } = useAuth();
-  const { items, createSwapRequest } = useItems();
-  const [selectedItemId, setSelectedItemId] = useState<string>('');
+const SwapRequestModal = ({ isOpen, onClose, requestedItem, offeredItem = null }) => {
+  const { currentUser } = useAuth();
+  const { items } = useItems();
+  const [selectedItemId, setSelectedItemId] = useState("");
 
   const userItems = items.filter(
-    (userItem) => 
-      userItem.uploaderId === user?.id && 
-      userItem.status === 'available' && 
-      userItem.id !== item.id
+    (item) =>
+      item.uploaderId === currentUser?.id &&
+      item.status === "available" &&
+      item.id !== requestedItem.id
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!selectedItemId) {
-      toast.error('Please select an item to offer');
+      toast.error("Please select one of your items to swap");
       return;
     }
 
-    createSwapRequest(item.id, selectedItemId, user!.id, item.uploaderId);
-    toast.success('Swap request sent successfully!');
+    // Placeholder logic for swap request
+    toast.success("Swap request sent (mocked, no DB action)");
+
+    // Reset form and close modal
+    setSelectedItemId("");
     onClose();
   };
 
   return (
-    <AnimatePresence>
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">Request Swap</h2>
+    <Dialog open={isOpen} onClose={onClose} className="fixed z-50 inset-0 overflow-y-auto">
+      <div className="flex items-center justify-center min-h-screen px-4 text-center">
+        <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
+
+        <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 z-10 relative">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+          >
+            <X className="w-5 h-5" />
+          </button>
+
+          <Dialog.Title className="text-2xl font-bold text-gray-900 mb-4">
+            Propose Swap
+          </Dialog.Title>
+
+          <p className="text-gray-700 mb-4">
+            Choose one of your available items to swap for{" "}
+            <span className="font-semibold">{requestedItem.title}</span>.
+          </p>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="yourItem" className="block text-sm font-medium text-gray-700 mb-1">
+                Your Item
+              </label>
+              <select
+                id="yourItem"
+                value={selectedItemId}
+                onChange={(e) => setSelectedItemId(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg p-2"
+              >
+                <option value="">Select an item</option>
+                {userItems.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.title} ({item.size})
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <button
-              onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+              type="submit"
+              className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 rounded-lg"
             >
-              <X className="h-5 w-5" />
+              Send Request
             </button>
-          </div>
-
-          {/* Content */}
-          <div className="p-6">
-            {/* Requested Item */}
-            <div className="mb-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-3">You want:</h3>
-              <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="w-16 h-16 object-cover rounded-lg"
-                />
-                <div>
-                  <h4 className="font-medium text-gray-900">{item.title}</h4>
-                  <p className="text-sm text-gray-600">{item.category} • {item.size}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-center mb-6">
-              <ArrowRight className="h-6 w-6 text-gray-400" />
-            </div>
-
-            {/* Your Items */}
-            <form onSubmit={handleSubmit}>
-              <h3 className="text-lg font-medium text-gray-900 mb-3">Select an item to offer:</h3>
-              
-              {userItems.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-gray-600 mb-4">You don't have any available items to swap.</p>
-                  <button
-                    type="button"
-                    onClick={onClose}
-                    className="text-teal-600 hover:text-teal-700 font-medium"
-                  >
-                    Add some items first
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-3 mb-6">
-                  {userItems.map((userItem) => (
-                    <label
-                      key={userItem.id}
-                      className={`flex items-center space-x-4 p-4 border-2 rounded-lg cursor-pointer transition-colors ${
-                        selectedItemId === userItem.id
-                          ? 'border-teal-500 bg-teal-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="selectedItem"
-                        value={userItem.id}
-                        checked={selectedItemId === userItem.id}
-                        onChange={(e) => setSelectedItemId(e.target.value)}
-                        className="text-teal-600 focus:ring-teal-500"
-                      />
-                      <img
-                        src={userItem.image}
-                        alt={userItem.title}
-                        className="w-16 h-16 object-cover rounded-lg"
-                      />
-                      <div className="flex-1">
-                        <h4 className="font-medium text-gray-900">{userItem.title}</h4>
-                        <p className="text-sm text-gray-600">
-                          {userItem.category} • {userItem.size} • {userItem.condition}
-                        </p>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              )}
-
-              {/* Actions */}
-              {userItems.length > 0 && (
-                <div className="flex space-x-4">
-                  <button
-                    type="button"
-                    onClick={onClose}
-                    className="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    type="submit"
-                    className="flex-1 px-6 py-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-lg font-medium hover:shadow-lg transition-shadow"
-                  >
-                    Send Request
-                  </motion.button>
-                </div>
-              )}
-            </form>
-          </div>
-        </motion.div>
+          </form>
+        </div>
       </div>
-    </AnimatePresence>
+    </Dialog>
   );
 };
 

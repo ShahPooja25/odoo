@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Heart, Share2, User, Calendar, Tag } from 'lucide-react';
+import { ArrowLeft, Heart, Share2, User, Calendar, Tag, Sparkles } from 'lucide-react';
 import { useItems } from '../contexts/ItemContext';
 import { useAuth } from '../contexts/AuthContext';
 import SwapRequestModal from '../components/SwapRequestModal';
+import AIAssistant from '../components/AIAssistant';
 import toast from 'react-hot-toast';
 
 const ItemDetailPage: React.FC = () => {
@@ -13,6 +14,7 @@ const ItemDetailPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [showSwapModal, setShowSwapModal] = useState(false);
+  const [showAIAssistant, setShowAIAssistant] = useState(false);
 
   const item = items.find(item => item.id === id);
 
@@ -45,6 +47,15 @@ const ItemDetailPage: React.FC = () => {
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
     toast.success('Link copied to clipboard!');
+  };
+
+  const handleAIAssistant = () => {
+    if (!isAuthenticated) {
+      toast.error('Please log in to use AI assistant');
+      navigate('/login');
+      return;
+    }
+    setShowAIAssistant(true);
   };
 
   return (
@@ -96,7 +107,9 @@ const ItemDetailPage: React.FC = () => {
                     </div>
                     <div className="flex items-center space-x-1">
                       <Calendar className="h-4 w-4" />
-                      <span>{item.createdAt.toLocaleDateString()}</span>
+                      <span>
+                        {new Date(item.createdAt).toLocaleDateString()}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -161,11 +174,11 @@ const ItemDetailPage: React.FC = () => {
             </div>
 
             {/* Tags */}
-            {item.tags.length > 0 && (
+            {item.tags?.length > 0 && (
               <div className="bg-white rounded-xl p-6 shadow-sm">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Tags</h2>
                 <div className="flex flex-wrap gap-2">
-                  {item.tags.map((tag) => (
+                  {item.tags.map((tag: string) => (
                     <span
                       key={tag}
                       className="flex items-center space-x-1 px-3 py-1 bg-teal-100 text-teal-800 text-sm rounded-full"
@@ -178,16 +191,28 @@ const ItemDetailPage: React.FC = () => {
               </div>
             )}
 
-            {/* Action Button */}
+            {/* Action Buttons */}
             {item.status === 'available' && (
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleSwapRequest}
-                className="w-full py-4 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-shadow"
-              >
-                Request Swap
-              </motion.button>
+              <div className="space-y-3">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleSwapRequest}
+                  className="w-full py-4 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-shadow"
+                >
+                  Propose Swap
+                </motion.button>
+
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleAIAssistant}
+                  className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-shadow flex items-center justify-center space-x-2"
+                >
+                  <Sparkles className="h-5 w-5" />
+                  <span>Get AI Recommendations</span>
+                </motion.button>
+              </div>
             )}
           </motion.div>
         </div>
@@ -196,8 +221,17 @@ const ItemDetailPage: React.FC = () => {
       {/* Swap Request Modal */}
       {showSwapModal && (
         <SwapRequestModal
-          item={item}
+          requestedItem={item}
           onClose={() => setShowSwapModal(false)}
+        />
+      )}
+
+      {/* AI Assistant Modal */}
+      {showAIAssistant && (
+        <AIAssistant
+          isOpen={showAIAssistant}
+          onClose={() => setShowAIAssistant(false)}
+          selectedItem={item}
         />
       )}
     </div>
