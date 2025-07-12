@@ -61,11 +61,10 @@ ReWear allows individuals to list, browse, and swap wearable garments with other
 ## 🔧 Tech Stack
 
 - **Frontend**: ReactJS (with Vite)
-- **Backend**: Node.js / Express or FastAPI *(customizable)*
-- **Database**: MongoDB / PostgreSQL *(based on your setup)*
-- **Authentication**: JWT or Firebase Auth
-- **Storage**: Cloudinary or Firebase Storage for images
-- **Deployment**: Vercel / Netlify (frontend) + Render / Railway / Heroku (backend)
+- **Backend**: Node.js / Express or FastAPI *(customizable)(propozed)*
+- **Database**: PostgreSQL *(based on your setup)*
+- **Authentication**: Supabase
+- **Storage**: local (for testing)
 
 ---
 
