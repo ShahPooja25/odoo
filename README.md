@@ -68,5 +68,4 @@ ReWear allows individuals to list, browse, and swap wearable garments with other
 
 ---
 
-## 📂 Folder Structure (Suggested)
 
