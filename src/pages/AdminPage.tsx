@@ -194,6 +194,8 @@ const AdminPage: React.FC = () => {
                         <span>•</span>
                         <span>{item.condition}</span>
                         <span>•</span>
+                        <span>{item.location}</span>
+                        <span>•</span>
                         <span>by {item.uploaderName}</span>
                         <span>•</span>
                         <span>{item.createdAt.toLocaleDateString()}</span>

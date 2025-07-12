@@ -27,6 +27,8 @@ const AddItemPage: React.FC = () => {
 
   const categories = ['Outerwear', 'Dresses', 'Shirts', 'Pants', 'Shoes', 'Accessories'];
   const conditions = ['Excellent', 'Very Good', 'Good', 'Fair'];
+    const location = ['Mumbai', 'Ahemdabad', 'Gandhinagar', 'Rajkot'];
+
   const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '6', '7', '8', '9', '10', '11', '12'];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
